@@ -62,14 +62,17 @@ func assignTeam(groupsByRole map[string]Stack, dynamics map[string]int, teams []
 }
 
 func printTeamDetails(teams [][]Member) {
+	count := 1
 	for _, team := range teams {
 		memberDetails := fmt.Sprintf("%-20s | %-20s | %-10s\n", "Name", "Role", "Profiency")
 		for _, member := range team {
 			memberDetail := fmt.Sprintf("%-20s | %-20s | %-10d\n", member.name, member.role, member.profiency)
 			memberDetails += memberDetail
 		}
+		fmt.Printf("Team %d\n", count)
 		fmt.Print(memberDetails)
 		fmt.Println()
+		count += 1
 	}
 }
 
@@ -81,7 +84,7 @@ func setup() ([]string, map[string]Stack, [][]Member, map[string]int, []Member) 
 	fmt.Print("Enter how many roles: ")
 	
 	numRoles, _ := reader.ReadString('\n')
-	numOfRoles, err := strconv.Atoi(strings.TrimSuffix(numRoles, "\n"))
+	numOfRoles, err := strconv.Atoi(removeNextLine(numRoles))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -96,7 +99,7 @@ func setup() ([]string, map[string]Stack, [][]Member, map[string]int, []Member) 
 		if err != nil {
 			log.Fatalln(err)
 		}
-		roles = append(roles, strings.Replace(strings.TrimSuffix(role, "\n"), " ", "_", -1))
+		roles = append(roles, strings.Replace(removeNextLine(role), " ", "_", -1))
 	}
 
 	groupsByRole := make(map[string]Stack, len(roles))
@@ -107,7 +110,7 @@ func setup() ([]string, map[string]Stack, [][]Member, map[string]int, []Member) 
 		format := fmt.Sprintf("Enter maximum number of people required for %s: ", role)
 		fmt.Print(format)
 		numPeople, _ := reader.ReadString('\n')
-		numOfPeople, err := strconv.Atoi(strings.TrimSuffix(numPeople, "\n"))
+		numOfPeople, err := strconv.Atoi(removeNextLine(numPeople))
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -141,7 +144,7 @@ func setup() ([]string, map[string]Stack, [][]Member, map[string]int, []Member) 
 		if profiency == "\n" {
 			break
 		}
-		numProfiency, err := strconv.Atoi(strings.TrimSuffix(profiency, "\n"))
+		numProfiency, err := strconv.Atoi(removeNextLine(profiency))
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -149,8 +152,8 @@ func setup() ([]string, map[string]Stack, [][]Member, map[string]int, []Member) 
 		members = append(
 			members, 
 			Member{
-				name: strings.TrimSuffix(name, "\n"), 
-				role: strings.TrimSuffix(role, "\n"), 
+				name: removeNextLine(name),
+				role: removeNextLine(role),
 				profiency: numProfiency,
 			},
 		)
@@ -158,16 +161,6 @@ func setup() ([]string, map[string]Stack, [][]Member, map[string]int, []Member) 
 
 	}
 
-	// members := []Member{
-	// 	Member{name: "tan", role: roles[0], profiency: 10},
-	// 	Member{name: "loh", role: roles[0], profiency: 1},
-	// 	Member{name: "yeo", role: roles[1], profiency: 5},
-	// 	Member{name: "chan", role: roles[1], profiency: 2},
-	// 	Member{name: "A", role: roles[1], profiency: 10},
-	// 	Member{name: "B", role: roles[0], profiency: 1},
-	// 	Member{name: "C", role: roles[1], profiency: 5},
-	// 	Member{name: "D", role: roles[0], profiency: 2},
-	// }
 	return roles, groupsByRole, teams, dynamics, members
 }
 
